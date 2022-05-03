@@ -98,7 +98,11 @@
 					to_chat(M, "<span class='warning'>[digest_alert_prey]</span>")
 					M.visible_message("<span class='notice'>You watch as [owner]'s form loses its additions.</span>")
 
-					owner.adjust_nutrition(400) // so eating dead mobs gives you *something*.
+					if(iscyborg(owner))
+						var/mob/living/silicon/robot/R = owner
+						R.cell.charge += (800)
+					else
+						owner.adjust_nutrition(400) // so eating dead mobs gives you *something*.
 					play_sound = pick(pred_death)
 					if(M && M.client && M.client.prefs.cit_toggles & DIGESTION_NOISES)
 						SEND_SOUND(M,prey_death)
@@ -112,7 +116,11 @@
 				// Deal digestion damage (and feed the pred)
 				if(!(M.status_flags & GODMODE))
 					M.adjustFireLoss(digest_burn)
-					owner.adjust_nutrition(1)
+					if(iscyborg(owner))
+						var/mob/living/silicon/robot/R = owner
+						R.cell.charge += (6)
+					else
+						owner.adjust_nutrition(1)
 
 			//Contaminate or gurgle items
 			var/obj/item/T = pick(touchable_items)
@@ -127,7 +135,13 @@
 						SEND_SOUND(M,prey_digest)
 					play_sound = pick(pred_digest)
 				if(M.stat != DEAD)
-					if(owner.nutrition >= NUTRITION_LEVEL_STARVING && (M.health < M.maxHealth))
+					if(iscyborg(owner))
+						var/mob/living/silicon/robot/R = owner
+						if(R.cell.charge >= 500 && (M.health < M.maxHealth))
+							M.adjustBruteLoss(-3)
+							M.adjustFireLoss(-3)
+							R.cell.charge += (-30)
+					else if(owner.nutrition >= NUTRITION_LEVEL_STARVING && (M.health < M.maxHealth))
 						M.adjustBruteLoss(-3)
 						M.adjustFireLoss(-3)
 						owner.adjust_nutrition(-5)
@@ -154,9 +168,15 @@
 					continue
 
 				if(M.nutrition >= 100) //Drain them until there's no nutrients left. Slowly "absorb" them.
-					var/oldnutrition = (M.nutrition * 0.05)
-					M.set_nutrition(M.nutrition * 0.95)
-					owner.adjust_nutrition(oldnutrition)
+					if(iscyborg(owner))
+						var/mob/living/silicon/robot/R = owner
+						var/oldnutrition = (M.nutrition * 0.05)
+						M.set_nutrition(M.nutrition * 0.95)
+						R.cell.charge += (round(oldnutrition*2))
+					else
+						var/oldnutrition = (M.nutrition * 0.05)
+						M.set_nutrition(M.nutrition * 0.95)
+						owner.adjust_nutrition(oldnutrition)
 				else if(M.nutrition < 100) //When they're finally drained.
 					absorb_living(M)
 					to_update = TRUE
