@@ -4344,6 +4344,7 @@
 #include "modular_splurt\code\game\area\areas\ruins\space.dm"
 #include "modular_splurt\code\game\gamemodes\objectives.dm"
 #include "modular_splurt\code\game\machinery\chem_alert.dm"
+#include "modular_splurt\code\game\machinery\compressor.dm"
 #include "modular_splurt\code\game\machinery\cryopod.dm"
 #include "modular_splurt\code\game\machinery\deployable.dm"
 #include "modular_splurt\code\game\machinery\limbgrower.dm"
